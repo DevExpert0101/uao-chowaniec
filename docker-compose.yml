@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: uaotestproject
+    volumes:
+      - mongo-data:/data/db
+
+  backend:
+    build: ./backend
+    container_name: backend
+    ports:
+      - "8001:8001"
+    depends_on:
+      - mongodb
+    environment:
+      - NODE_ENV=development
+      - CONNECTION_STRING=mongodb://root:uaotestproject@mongodb:27017/
+    command: npm run dev
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "8080:8080"
+    command: npm run dev -- --host 0.0.0.0
+
+volumes:
+  mongo-data:
